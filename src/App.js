@@ -1,8 +1,10 @@
 import styled from "styled-components";
 import TodoBoard from "./components/TodoBoard";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { applyDrag } from "./utilities/dragDrop";
 import { useSelector } from "react-redux";
+import FilterTask from "./components/FilterTask";
+import { initData } from "./mockData/initData";
 
 const Wrapper = styled.div`
   margin: 30px 40px;
@@ -24,9 +26,9 @@ const ManageBoard = styled.div`
 `;
 
 function App() {
-  const data = useSelector((state) => state);
-  const boardInitData = useSelector((state) => state.todoItems);
-  const [columns, setColumns] = useState(boardInitData.columns);
+  const data = useSelector((state) => state.todoItems);
+
+  const [columns, setColumns] = useState([]);
 
   const onDrop = (dropResult, columnId) => {
     if (dropResult.removedIndex !== null || dropResult.addedIndex !== null) {
@@ -35,14 +37,24 @@ function App() {
       currentColumn.cards = applyDrag(currentColumn.cards, dropResult);
       setColumns(newColumns);
     }
+    localStorage.setItem(
+      "listItems",
+      JSON.stringify({ id: "board-1", columns })
+    );
   };
 
-  console.log(data);
+  useEffect(() => {
+    setColumns(data.columns);
+  }, [data.columns]);
 
   return (
     <div className="App">
       <Wrapper>
         <Title>TO DO LIST</Title>
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <FilterTask setColumns={setColumns} />
+        </div>
+
         <ManageBoard>
           {columns?.map((data, index) => (
             <TodoBoard data={data} key={data.id} onDrop={onDrop} />

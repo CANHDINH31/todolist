@@ -1,16 +1,17 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import styled from "styled-components";
+import Paper from "@mui/material/Paper";
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import ModeEditOutlinedIcon from "@mui/icons-material/ModeEditOutlined";
+import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
+import SaveAsOutlinedIcon from "@mui/icons-material/SaveAsOutlined";
 import NotInterestedOutlinedIcon from "@mui/icons-material/NotInterestedOutlined";
 import DoneOutlinedIcon from "@mui/icons-material/DoneOutlined";
 import { useDispatch } from "react-redux";
-import { deleteTask, updateTask } from "../redux/actions/listActions";
+import { updateTask } from "../redux/actions/listActions";
 import { getCurrentTime } from "../utilities/getCurrentTime";
-import { deleteSuccess } from "../redux/actions/messageActions";
-
-const Container = styled.div`
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+const Container = styled(Paper)`
   background-color: #fff;
   box-shadow: 0 3px 7px 0 rgb(110 142 247 / 13%);
   border: 1px solid #e1e2e8;
@@ -31,6 +32,7 @@ const TimeTask = styled.div`
 
 const Detailtask = styled.div`
   font-size: 15px;
+  font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -58,9 +60,11 @@ const InputUpdate = styled.input`
   flex: 1;
   padding: 2px 4px;
   font-size: 17px;
+  z-index: 2;
 `;
 
 const GroupIconUpDate = styled.div`
+  z-index: 2;
   display: flex;
   gap: 4px;
   & > :nth-child(1) {
@@ -72,26 +76,32 @@ const GroupIconUpDate = styled.div`
   }
 
   & > svg {
-    font-size: 22px;
-
-    font-weight: 700;
+    font-size: 20px;
   }
 `;
 
-export const TaskToDo = ({ data }) => {
+const Overlay = styled.div`
+  position: fixed;
+  background-color: rgba(247, 248, 254, 0.5);
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 1;
+`;
+
+export const TaskToDo = ({ data, onDelete }) => {
   const dispatch = useDispatch();
 
   const [isOpenUpdate, setIsOpenUpdate] = useState(false);
   const [inputUpdate, setInputUpdate] = useState(data.title);
 
-  const handleDelete = async () => {
-    if (window.confirm("Are you sure delete this task") === true) {
-      try {
-        dispatch(deleteTask(data));
-      } catch (err) {}
-    }
-    // dispatch(deleteSuccess());
-  };
+  const notify = useCallback(
+    (message) => {
+      toast.success(message);
+    },
+    [dispatch]
+  );
 
   const handleUpdate = () => {
     if (inputUpdate !== data.title) {
@@ -102,6 +112,7 @@ export const TaskToDo = ({ data }) => {
           time: getCurrentTime(),
         })
       );
+      notify("Update Task Success");
     }
     setIsOpenUpdate(false);
   };
@@ -111,7 +122,7 @@ export const TaskToDo = ({ data }) => {
   };
 
   return (
-    <Container>
+    <Container elevation={3}>
       {!isOpenUpdate ? (
         <>
           <TimeTask>
@@ -121,8 +132,8 @@ export const TaskToDo = ({ data }) => {
           <Detailtask>
             <span>{data.title}</span>
             <SettingTask>
-              <ModeEditOutlinedIcon onClick={() => setIsOpenUpdate(true)} />
-              <DeleteOutlineOutlinedIcon onClick={handleDelete} />
+              <SaveAsOutlinedIcon onClick={() => setIsOpenUpdate(true)} />
+              <DeleteForeverOutlinedIcon onClick={() => onDelete(data)} />
             </SettingTask>
           </Detailtask>
         </>
@@ -131,14 +142,21 @@ export const TaskToDo = ({ data }) => {
           <Update>
             <InputUpdate value={inputUpdate} onChange={changeInputUpdate} />
             <GroupIconUpDate>
-              <DoneOutlinedIcon onClick={handleUpdate} />
+              <DoneOutlinedIcon
+                onClick={handleUpdate}
+                sx={{ fontWeight: 700 }}
+              />
               <NotInterestedOutlinedIcon
                 onClick={() => setIsOpenUpdate(false)}
+                sx={{ fontWeight: 700 }}
               />
             </GroupIconUpDate>
+            <Overlay></Overlay>
           </Update>
         </>
       )}
+
+      <ToastContainer />
     </Container>
   );
 };

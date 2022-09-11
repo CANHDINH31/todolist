@@ -18,3 +18,16 @@ export const updateTask = (payload) => async (dispatch) => {
     payload,
   });
 };
+
+export const searchTask = (payload) => async (dispatch) => {
+  dispatch({
+    type: "SEARCH_TASK",
+    payload,
+  });
+};
+
+export const restoreTask = (payload) => async (dispatch) => {
+  dispatch({
+    type: "RESTORE_TASK",
+  });
+};
