@@ -98,7 +98,15 @@ export const TaskToDo = ({ data, onDelete }) => {
 
   const notify = useCallback(
     (message) => {
-      toast.success(message);
+      toast.success(message, {
+        position: "top-right",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+      });
     },
     [dispatch]
   );
@@ -156,7 +164,17 @@ export const TaskToDo = ({ data, onDelete }) => {
         </>
       )}
 
-      <ToastContainer />
+      <ToastContainer
+        position="top-right"
+        autoClose={1000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover={false}
+      />
     </Container>
   );
 };

@@ -91,7 +91,7 @@ const FilterTask = () => {
   const [startDate, setStartDate] = useState(new Date());
 
   const handleSearch = () => {
-    const date = formatDate(startDate);
+    const date = startDate ? formatDate(startDate) : "";
     let newData = [
       { id: "column-1", title: "TO DO" },
       { id: "column-2", title: "IN PROGRESS" },
